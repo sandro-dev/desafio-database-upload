@@ -10,7 +10,7 @@ interface CSVTransaction {
   title: string;
   type: 'income' | 'outcome';
   value: number;
-  category: string;
+  category: any;
 }
 
 class ImportTransactionsService {
@@ -62,14 +62,16 @@ class ImportTransactionsService {
     const finalCategories = [...newCategories, ...existentCategories];
 
     const createdTransactions = transactionsRepository.create(
-      transactions.map(transaction => ({
-        title: transaction.title,
-        type: transaction.type,
-        value: transaction.value,
-        category: finalCategories.find(
-          category => category.title === transaction.category,
-        ),
-      })),
+      transactions.map(
+        (transaction): CSVTransaction => ({
+          title: transaction.title,
+          type: transaction.type,
+          value: transaction.value,
+          category: finalCategories.find(
+            category => category.title === transaction.category,
+          ),
+        }),
+      ),
     );
 
     await transactionsRepository.save(createdTransactions);
